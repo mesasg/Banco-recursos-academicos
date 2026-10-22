@@ -1,0 +1,54 @@
+@import './styles/tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Foco visible y consistente en toda la app. */
+  :focus-visible {
+    outline: 2px solid rgb(var(--color-primary-600));
+    outline-offset: 2px;
+  }
+
+  /* Sobre el header (fondo primary-500) el foco va en blanco. */
+  .on-brand :focus-visible {
+    outline-color: #fff;
+  }
+
+  [inert] {
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-line bg-surface shadow-card;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--color-line)) transparent;
+  }
+}

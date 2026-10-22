@@ -1,0 +1,28 @@
+/*
+ * Tokens de diseño. Los colores se guardan como canales RGB para que
+ * Tailwind pueda aplicar opacidad (bg-primary-500/20, etc.).
+ *
+ * Contraste (WCAG AA):
+ *  - primary-500 + blanco = 3,4:1 → solo texto grande (≥18px seminegrita) e íconos.
+ *  - primary-600 + blanco = 5,2:1 → botones con texto normal.
+ *  - primary-700 + blanco = 7,3:1 → hover / pressed.
+ */
+:root {
+  --color-primary-50: 243 248 250; /* #F3F8FA */
+  --color-primary-100: 230 240 244; /* #E6F0F4 */
+  --color-primary-500: 91 147 168; /* #5B93A8 */
+  --color-primary-600: 63 116 137; /* #3F7489 */
+  --color-primary-700: 47 92 110; /* #2F5C6E */
+
+  --color-canvas: 247 248 250; /* #F7F8FA */
+  --color-surface: 255 255 255; /* #FFFFFF */
+  --color-line: 226 230 234; /* #E2E6EA */
+  --color-ink: 31 41 51; /* #1F2933 */
+  --color-ink-muted: 95 107 118; /* #5F6B76 */
+
+  --color-success: 46 139 87; /* #2E8B57 */
+  --color-danger: 192 57 43; /* #C0392B */
+  --color-warning: 217 130 43; /* #D9822B */
+
+  --header-height: 64px;
+}
