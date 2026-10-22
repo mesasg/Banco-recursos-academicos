@@ -11,7 +11,6 @@ export interface MockPost {
   attachments: Attachment[];
   createdAt: string;
   updatedAt?: string;
-  commentCount: number;
   /** Valoraciones históricas (de usuarios que no están en el mock). */
   baseRatingSum: number;
   baseRatingCount: number;
@@ -66,7 +65,6 @@ export function createMockPosts(): MockPost[] {
         image('p1-a2', 'rotaciones-avl.svg', 'tree', 'Rotación doble LR'),
       ],
       createdAt: hoursAgo(2),
-      commentCount: 8,
       ...rating(4.6, 14),
     },
     {
@@ -79,7 +77,6 @@ export function createMockPosts(): MockPost[] {
       subjectId: 'ind-calculo2',
       attachments: [pdf('p2-a1', 'Taller-integrales-multiples.pdf', 3_420_000)],
       createdAt: hoursAgo(5),
-      commentCount: 12,
       ...rating(4.8, 21),
     },
     {
@@ -95,7 +92,6 @@ export function createMockPosts(): MockPost[] {
         image('p3-a2', 'circuito-tarea-3.svg', 'circuit', 'Malla con dos fuentes'),
       ],
       createdAt: hoursAgo(9),
-      commentCount: 5,
       ...rating(4.4, 9),
     },
     {
@@ -111,7 +107,6 @@ export function createMockPosts(): MockPost[] {
         image('p4-a2', 'modelo-entidad-relacion.svg', 'graph', 'Modelo E-R facturación'),
       ],
       createdAt: hoursAgo(26),
-      commentCount: 6,
       ...rating(4.5, 11),
     },
     {
@@ -126,7 +121,6 @@ export function createMockPosts(): MockPost[] {
         image('p5-a2', 'dcl-viga.svg', 'graph', 'DCL viga simplemente apoyada'),
       ],
       createdAt: hoursAgo(36),
-      commentCount: 3,
       ...rating(4.2, 6),
     },
     {
@@ -143,7 +137,6 @@ export function createMockPosts(): MockPost[] {
         image('p6-a3', 'mapa-k-4-variables.svg', 'chart', 'Mapa K de 4 variables'),
       ],
       createdAt: hoursAgo(50),
-      commentCount: 4,
       ...rating(4.0, 7),
     },
     {
@@ -159,7 +152,6 @@ export function createMockPosts(): MockPost[] {
         link('p7-a2', 'Catálogo de patrones (Refactoring.Guru)', 'https://refactoring.guru/es/design-patterns'),
       ],
       createdAt: hoursAgo(74),
-      commentCount: 10,
       ...rating(4.7, 18),
     },
     {
@@ -171,7 +163,6 @@ export function createMockPosts(): MockPost[] {
       subjectId: 'ind-estadistica',
       attachments: [pdf('p8-a1', 'Formulario-distribuciones.pdf', 640_000)],
       createdAt: hoursAgo(98),
-      commentCount: 2,
       ...rating(4.9, 25),
     },
     {
@@ -187,7 +178,6 @@ export function createMockPosts(): MockPost[] {
         pdf('p9-a2', 'Notas-Fourier.pdf', 1_120_000),
       ],
       createdAt: hoursAgo(122),
-      commentCount: 7,
       ...rating(4.6, 13),
     },
     {
@@ -199,7 +189,6 @@ export function createMockPosts(): MockPost[] {
       subjectId: 'sis-calculo2',
       attachments: [image('p10-a1', 'mapa-criterios-convergencia.svg', 'tree', 'Criterios de convergencia')],
       createdAt: hoursAgo(146),
-      commentCount: 4,
       ...rating(4.3, 8),
     },
     {
@@ -211,7 +200,6 @@ export function createMockPosts(): MockPost[] {
       subjectId: 'civ-topografia',
       attachments: [pdf('p11-a1', 'Nivelacion-geometrica.pdf', 4_300_000)],
       createdAt: hoursAgo(194),
-      commentCount: 1,
       ...rating(3.9, 5),
     },
     {
@@ -226,7 +214,6 @@ export function createMockPosts(): MockPost[] {
         image('p12-a2', 'montaje-inversor.svg', 'circuit', 'Amplificador inversor'),
       ],
       createdAt: hoursAgo(242),
-      commentCount: 6,
       ...rating(4.1, 10),
     },
     {
@@ -241,7 +228,6 @@ export function createMockPosts(): MockPost[] {
         link('p13-a2', 'Curso libre de redes (Khan Academy)', 'https://www.khanacademy.org/computing/computers-and-internet'),
       ],
       createdAt: hoursAgo(290),
-      commentCount: 3,
       ...rating(4.4, 12),
     },
     {
@@ -256,7 +242,6 @@ export function createMockPosts(): MockPost[] {
         link('p14-a2', 'Calculadora gráfica GeoGebra', 'https://www.geogebra.org/graphing'),
       ],
       createdAt: hoursAgo(362),
-      commentCount: 9,
       ...rating(4.5, 16),
     },
     {
@@ -268,7 +253,6 @@ export function createMockPosts(): MockPost[] {
       subjectId: 'ele-fisica',
       attachments: [pdf('p15-a1', 'Cinematica-y-dinamica.pdf', 2_250_000)],
       createdAt: hoursAgo(434),
-      commentCount: 2,
       ...rating(4.0, 6),
     },
     {
@@ -280,7 +264,6 @@ export function createMockPosts(): MockPost[] {
       subjectId: 'sis-estructuras',
       attachments: [link('p16-a1', 'VisuAlgo: ordenamiento', 'https://visualgo.net/es/sorting')],
       createdAt: hoursAgo(506),
-      commentCount: 5,
       ...rating(4.6, 9),
     },
     {
@@ -295,7 +278,6 @@ export function createMockPosts(): MockPost[] {
         image('p17-a2', 'curva-esfuerzo-deformacion.svg', 'chart', 'Curva esfuerzo-deformación'),
       ],
       createdAt: hoursAgo(600),
-      commentCount: 4,
       ...rating(4.3, 7),
     },
   ];

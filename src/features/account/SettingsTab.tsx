@@ -133,7 +133,7 @@ function ProfileForm() {
           <Select label="Carrera" required value={careerId} onChange={(e) => setCareerId(e.target.value)} options={careers.map((c) => ({ value: c.id, label: c.name }))} />
         </div>
 
-        <Input label="Correo institucional" value={user.email} readOnly hint="El correo institucional no se puede cambiar." />
+        <Input label="Correo electrónico" value={user.email} readOnly hint="El correo de tu cuenta no se puede cambiar." />
 
         <div className="flex justify-end">
           <Button type="submit" loading={saving} loadingLabel="Guardando…" disabled={!dirty}>

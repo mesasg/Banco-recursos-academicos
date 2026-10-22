@@ -11,6 +11,7 @@ import { LoginPage } from '@/pages/LoginPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { PostFormPage } from '@/pages/PostFormPage';
 import { RegisterPage } from '@/pages/RegisterPage';
+import { ThreadPage } from '@/pages/ThreadPage';
 
 const POST_FORM_PATHS = ['/publicar', '/publicar/:postId/editar'];
 
@@ -45,6 +46,7 @@ export function App() {
           <Route element={<AppLayout />}>
             <Route index element={<HomePage />} />
             <Route path="/cuenta" element={<AccountPage />} />
+            <Route path="/foro/:threadId" element={<ThreadPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Route>

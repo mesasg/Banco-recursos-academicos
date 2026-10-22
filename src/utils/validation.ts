@@ -1,10 +1,7 @@
-import { INSTITUTIONAL_EMAIL_REGEX } from '@/config';
-
-export function validateInstitutionalEmail(email: string): string | undefined {
+export function validateEmail(email: string): string | undefined {
   const value = email.trim();
-  if (!value) return 'Escribe tu correo institucional.';
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'El correo no tiene un formato válido.';
-  if (!INSTITUTIONAL_EMAIL_REGEX.test(value)) return 'Usa tu correo institucional (termina en .edu.co).';
+  if (!value) return 'Escribe tu correo electrónico.';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) return 'El correo no tiene un formato válido.';
   return undefined;
 }
 

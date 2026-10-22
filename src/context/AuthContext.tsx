@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { authService } from '@/services';
-import type { User } from '@/types';
+import type { RegisterInput, User } from '@/types';
 
 type AuthStatus = 'loading' | 'authenticated' | 'anonymous';
 
@@ -8,6 +8,7 @@ interface AuthContextValue {
   status: AuthStatus;
   user: User | null;
   login: (email: string, password: string, remember: boolean) => Promise<User>;
+  register: (input: RegisterInput) => Promise<User>;
   logout: () => Promise<void>;
   /** Actualiza el usuario en memoria (después de editar el perfil). */
   setUser: (user: User) => void;
@@ -43,6 +44,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return session.user;
   }, []);
 
+  const register = useCallback(async (input: RegisterInput) => {
+    const session = await authService.register(input);
+    setUserState(session.user);
+    setStatus('authenticated');
+    return session.user;
+  }, []);
+
   const clearSession = useCallback(() => {
     setUserState(null);
     setStatus('anonymous');
@@ -56,8 +64,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const setUser = useCallback((next: User) => setUserState(next), []);
 
   const value = useMemo(
-    () => ({ status, user, login, logout, setUser, clearSession }),
-    [status, user, login, logout, setUser, clearSession],
+    () => ({ status, user, login, register, logout, setUser, clearSession }),
+    [status, user, login, register, logout, setUser, clearSession],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

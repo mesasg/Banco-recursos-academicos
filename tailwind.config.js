@@ -23,6 +23,7 @@ export default {
           muted: token('ink-muted'),
         },
         success: token('success'),
+        'success-strong': token('success-strong'),
         danger: token('danger'),
         warning: token('warning'),
       },

@@ -70,7 +70,6 @@ export interface Post {
   ratingCount: number;
   /** Valoración que le dio el usuario actual (si la hay). */
   myRating?: number;
-  commentCount: number;
 }
 
 export interface PostInput {
@@ -101,9 +100,63 @@ export interface Page<T> {
   hasMore: boolean;
 }
 
+/* ---------- Foros ---------- */
+
+/** Pregunta del foro de una materia. */
+export interface ForumThread {
+  id: ID;
+  title: string;
+  body: string;
+  author: UserSummary;
+  career: NamedRef;
+  subject: NamedRef;
+  createdAt: string;
+  /** Fecha de la última respuesta (o de la pregunta si no tiene). */
+  lastActivityAt: string;
+  replyCount: number;
+  /** Respuesta marcada como solución por el autor de la pregunta. */
+  acceptedReplyId?: ID;
+}
+
+export interface ForumReply {
+  id: ID;
+  threadId: ID;
+  body: string;
+  author: UserSummary;
+  createdAt: string;
+}
+
+export interface ForumThreadDetail {
+  thread: ForumThread;
+  replies: ForumReply[];
+}
+
+export interface ThreadQuery {
+  q?: string;
+  careerId?: ID;
+  subjectId?: ID;
+  authorId?: ID;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface ThreadInput {
+  subjectId: ID;
+  title: string;
+  body: string;
+}
+
 export interface Session {
   token: string;
   user: User;
+}
+
+export interface RegisterInput {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  careerId: ID;
 }
 
 export interface ProfileUpdate {

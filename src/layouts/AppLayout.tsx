@@ -33,7 +33,7 @@ export function AppLayout() {
   const { openCreate } = usePostFormNavigation();
 
   const isDesktop = useMediaQuery(breakpoints.lg);
-  const [collapsed, setCollapsed] = useLocalStorageState('notadad:sidebar-collapsed', false);
+  const [collapsed, setCollapsed] = useLocalStorageState('ingenotes:sidebar-collapsed', false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Al pasar a desktop el drawer no tiene sentido.

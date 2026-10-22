@@ -5,7 +5,6 @@ import {
   FileText,
   Image as ImageIcon,
   Link2,
-  MessageSquare,
   MoreHorizontal,
   Pencil,
   Star,
@@ -256,10 +255,6 @@ export function PostCard({ post, onEdit, onDelete, onFilterSubject, onFilterCare
             </button>
           )}
         </div>
-        <p className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-muted">
-          <MessageSquare className="h-4 w-4" aria-hidden />
-          {pluralize(post.commentCount, 'respuesta', 'respuestas')} en el foro
-        </p>
         {rating && (
           <div className="flex w-full items-center gap-3 rounded-lg bg-primary-50 px-3 py-1">
             <span className="text-sm text-ink">¿Qué tan útil te resultó?</span>

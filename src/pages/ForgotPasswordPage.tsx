@@ -5,7 +5,7 @@ import { Button, buttonClasses } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Logo } from '@/components/Logo';
 import { authService, errorMessage } from '@/services';
-import { validateInstitutionalEmail } from '@/utils/validation';
+import { validateEmail } from '@/utils/validation';
 
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -15,7 +15,7 @@ export function ForgotPasswordPage() {
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    const validation = validateInstitutionalEmail(email);
+    const validation = validateEmail(email);
     setError(validation);
     if (validation) return;
     setSending(true);
@@ -50,11 +50,11 @@ export function ForgotPasswordPage() {
         <>
           <h1 className="mt-6 text-center text-2xl font-semibold text-ink">¿Olvidaste tu contraseña?</h1>
           <p className="mt-2 text-center text-sm text-ink-muted">
-            Escribe tu correo institucional y te enviaremos un enlace para restablecerla.
+            Escribe tu correo y te enviaremos un enlace para restablecerla.
           </p>
           <form onSubmit={onSubmit} noValidate className="mt-6 flex flex-col gap-4">
             <Input
-              label="Correo institucional"
+              label="Correo electrónico"
               type="email"
               autoComplete="email"
               value={email}

@@ -1,15 +1,15 @@
-import { db, persist } from '@/mocks/db';
-import type { Session } from '@/types';
+import { db, newId, persist } from '@/mocks/db';
+import type { RegisterInput, Session } from '@/types';
 import { ApiError, mockDelay, setAuthToken } from './apiClient';
 import { toUser } from './mappers';
 
 /**
  * Autenticación.
- * Backend real: POST /api/auth/login, POST /api/auth/logout, GET /api/auth/me,
+ * Backend real: POST /api/auth/register, POST /api/auth/login, POST /api/auth/logout, GET /api/auth/me,
  * PUT /api/auth/password, DELETE /api/users/me (o Supabase Auth).
  */
 
-const SESSION_KEY = 'notadad:session';
+const SESSION_KEY = 'ingenotes:session';
 
 interface StoredSession {
   token: string;
@@ -62,6 +62,35 @@ export async function login(email: string, password: string, remember: boolean):
   return { token, user: toUser(user) };
 }
 
+/** Crea la cuenta e inicia sesión. Backend real: POST /api/auth/register. */
+export async function register(input: RegisterInput): Promise<Session> {
+  await mockDelay(600, 1000);
+  const data = db();
+  const email = input.email.trim().toLowerCase();
+  if (data.users.some((u) => u.email.toLowerCase() === email)) {
+    throw new ApiError('Ya existe una cuenta con ese correo. Inicia sesión o usa otro.', 409, 'EMAIL_TAKEN');
+  }
+  if (!data.careers.some((c) => c.id === input.careerId)) {
+    throw new ApiError('Elige una carrera válida.', 400);
+  }
+  const user = {
+    id: newId('u'),
+    name: `${input.firstName.trim()} ${input.lastName.trim()}`,
+    email,
+    careerId: input.careerId,
+    joinedAt: new Date().toISOString(),
+    password: input.password,
+  };
+  data.users.push(user);
+  data.favorites[user.id] = [];
+  persist();
+
+  const token = `mock-token-${user.id}-${Date.now()}`;
+  writeStored({ token, userId: user.id }, true);
+  setAuthToken(token);
+  return { token, user: toUser(user) };
+}
+
 /** Recupera la sesión guardada al recargar la página. */
 export async function restoreSession(): Promise<Session | null> {
   const stored = readStored();
@@ -104,6 +133,9 @@ export async function deleteAccount(): Promise<void> {
   const userId = currentUserId();
   data.users = data.users.filter((u) => u.id !== userId);
   data.posts = data.posts.filter((p) => p.authorId !== userId);
+  const removedThreads = new Set(data.threads.filter((t) => t.authorId === userId).map((t) => t.id));
+  data.threads = data.threads.filter((t) => !removedThreads.has(t.id));
+  data.replies = data.replies.filter((r) => r.authorId !== userId && !removedThreads.has(r.threadId));
   delete data.favorites[userId];
   for (const list of Object.keys(data.favorites)) {
     data.favorites[list] = data.favorites[list].filter((id) => id !== userId);

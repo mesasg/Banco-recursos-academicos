@@ -1,4 +1,5 @@
 import { mockCareers, type MockCareer } from './careers';
+import { createMockForum, type MockReply, type MockThread } from './forum';
 import { createMockPosts, type MockPost } from './posts';
 import { mockFavorites, mockUsers, type MockUser } from './users';
 
@@ -16,14 +17,17 @@ export interface MockDb {
   favorites: Record<string, string[]>;
   /** postId → (userId → valoración 1..5). */
   ratings: Record<string, Record<string, number>>;
+  threads: MockThread[];
+  replies: MockReply[];
 }
 
-const STORAGE_KEY = 'notadad:mock-db';
-const DB_VERSION = 1;
+const STORAGE_KEY = 'ingenotes:mock-db';
+const DB_VERSION = 2;
 
 function seed(): MockDb {
   return {
     version: DB_VERSION,
+    ...createMockForum(),
     careers: mockCareers,
     users: mockUsers.map((u) => ({ ...u })),
     posts: createMockPosts(),
@@ -44,6 +48,8 @@ function load(): MockDb {
     if (raw) {
       const parsed = JSON.parse(raw) as MockDb;
       if (parsed.version === DB_VERSION) return parsed;
+      // v1 → v2: se agregan los foros sin perder cuentas ni publicaciones creadas.
+      if (parsed.version === 1) return { ...parsed, ...createMockForum(), version: DB_VERSION };
     }
   } catch {
     // Almacenamiento no disponible o datos corruptos: se usa la semilla.

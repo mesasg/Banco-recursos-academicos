@@ -4,6 +4,7 @@
  */
 export * as authService from './authService';
 export * as catalogService from './catalogService';
+export * as forumService from './forumService';
 export * as postService from './postService';
 export * as userService from './userService';
 export { ApiError } from './apiClient';

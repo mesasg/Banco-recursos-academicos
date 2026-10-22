@@ -90,7 +90,6 @@ export async function createPost(input: PostInput): Promise<Post> {
     subjectId: input.subjectId,
     attachments: input.attachments,
     createdAt: new Date().toISOString(),
-    commentCount: 0,
     baseRatingSum: 0,
     baseRatingCount: 0,
   };

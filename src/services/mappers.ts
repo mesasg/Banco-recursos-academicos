@@ -56,6 +56,5 @@ export function toPost(p: MockPost, viewerId?: string): Post {
     ratingAvg: avg,
     ratingCount: count,
     myRating: viewerId ? db().ratings[p.id]?.[viewerId] : undefined,
-    commentCount: p.commentCount,
   };
 }

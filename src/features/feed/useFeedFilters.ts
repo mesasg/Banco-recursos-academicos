@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
-export type FeedView = 'recientes' | 'favoritos';
+/** "foro" solo existe con una carrera o materia seleccionada. */
+export type FeedView = 'recientes' | 'favoritos' | 'foro';
 
 export interface FeedFilters {
   q: string;
@@ -34,8 +35,12 @@ function apply(base: URLSearchParams, patch: FeedFiltersPatch): URLSearchParams 
     else next.delete(PARAMS[key]);
   }
   if ('view' in patch) {
-    if (patch.view === 'favoritos') next.set('vista', 'favoritos');
+    if (patch.view && patch.view !== 'recientes') next.set('vista', patch.view);
     else next.delete('vista');
+  }
+  // Sin carrera ni materia no hay foro: se vuelve a "Recientes".
+  if (next.get('vista') === 'foro' && !next.get(PARAMS.subjectId) && !next.get(PARAMS.careerId)) {
+    next.delete('vista');
   }
   return next;
 }
@@ -50,16 +55,14 @@ export function useFeedFilters() {
   const navigate = useNavigate();
   const onFeed = location.pathname === '/';
 
-  const filters = useMemo<FeedFilters>(
-    () => ({
-      q: params.get(PARAMS.q) ?? '',
-      subjectId: params.get(PARAMS.subjectId),
-      careerId: params.get(PARAMS.careerId),
-      authorId: params.get(PARAMS.authorId),
-      view: params.get('vista') === 'favoritos' ? 'favoritos' : 'recientes',
-    }),
-    [params],
-  );
+  const filters = useMemo<FeedFilters>(() => {
+    const subjectId = params.get(PARAMS.subjectId);
+    const careerId = params.get(PARAMS.careerId);
+    const vista = params.get('vista');
+    const view: FeedView =
+      vista === 'favoritos' ? 'favoritos' : vista === 'foro' && (subjectId || careerId) ? 'foro' : 'recientes';
+    return { q: params.get(PARAMS.q) ?? '', subjectId, careerId, authorId: params.get(PARAMS.authorId), view };
+  }, [params]);
 
   /** URL del feed con los filtros aplicados (conserva los actuales si ya estás en el feed). */
   const feedHref = useCallback(

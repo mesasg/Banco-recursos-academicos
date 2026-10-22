@@ -8,7 +8,7 @@ import { APP_NAME, APP_TAGLINE } from '@/config';
 import { useAuth } from '@/context/AuthContext';
 import { DEMO_EMAIL, DEMO_PASSWORD } from '@/mocks/users';
 import { errorMessage } from '@/services';
-import { validateInstitutionalEmail } from '@/utils/validation';
+import { validateEmail } from '@/utils/validation';
 
 interface FieldErrors {
   email?: string;
@@ -32,7 +32,7 @@ export function LoginPage() {
   const passwordRef = useRef<HTMLInputElement>(null);
 
   const validate = (): FieldErrors => ({
-    email: validateInstitutionalEmail(email),
+    email: validateEmail(email),
     password: password ? undefined : 'Escribe tu contraseña.',
   });
 
@@ -75,14 +75,14 @@ export function LoginPage() {
         <form onSubmit={onSubmit} noValidate className="mt-6 flex flex-col gap-4">
           <Input
             ref={emailRef}
-            label="Correo institucional"
+            label="Correo electrónico"
             type="email"
             autoComplete="username"
             inputMode="email"
-            placeholder="nombre.apellido@universidad.edu.co"
+            placeholder="tu.correo@ejemplo.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            onBlur={() => email && setErrors((p) => ({ ...p, email: validateInstitutionalEmail(email) }))}
+            onBlur={() => email && setErrors((p) => ({ ...p, email: validateEmail(email) }))}
             error={errors.email}
             startIcon={<Mail className="h-4 w-4" />}
             required

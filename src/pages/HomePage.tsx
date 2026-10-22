@@ -1,4 +1,4 @@
-import { Clock, Plus, Star } from 'lucide-react';
+import { Clock, MessagesSquare, Plus, Star } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
 import { EmptyState } from '@/components/EmptyState';
@@ -7,6 +7,7 @@ import { useCatalog } from '@/context/CatalogContext';
 import { useFavorites } from '@/context/FavoritesContext';
 import { SearchBar } from '@/features/feed/SearchBar';
 import { useFeedFilters, type FeedView } from '@/features/feed/useFeedFilters';
+import { ForumPanel } from '@/features/forum/ForumPanel';
 import { PostList } from '@/features/posts/PostList';
 import { usePostFormNavigation } from '@/features/posts/usePostFormNavigation';
 import { usePosts } from '@/features/posts/usePosts';
@@ -21,6 +22,9 @@ export function HomePage() {
   const { openCreate } = usePostFormNavigation();
 
   const onlyFavorites = filters.view === 'favoritos';
+  const inForum = filters.view === 'foro';
+  // El foro es de una carrera o materia: en el inicio sin filtro no aparece.
+  const forumAvailable = Boolean(filters.subjectId || filters.careerId);
   const favoritesKey = favorites.map((f) => f.id).sort().join(',');
 
   const posts = usePosts(
@@ -32,7 +36,7 @@ export function HomePage() {
       onlyFavorites,
     },
     // En "Favoritos", agregar o quitar a alguien refresca la lista.
-    { refreshToken: onlyFavorites ? favoritesKey : undefined },
+    { refreshToken: onlyFavorites ? favoritesKey : undefined, enabled: !inForum },
   );
 
   const subject = findSubject(filters.subjectId);
@@ -117,11 +121,14 @@ export function HomePage() {
         items={[
           { id: 'recientes', label: 'Recientes', icon: <Clock className="h-4 w-4" aria-hidden /> },
           { id: 'favoritos', label: 'Favoritos', icon: <Star className="h-4 w-4" aria-hidden /> },
+          ...(forumAvailable
+            ? [{ id: 'foro' as const, label: 'Foro', icon: <MessagesSquare className="h-4 w-4" aria-hidden /> }]
+            : []),
         ]}
       />
 
       <TabPanel idBase={TABS_ID} id={filters.view} className="pt-4">
-        {(activeFilters > 0 || posts.status === 'success') && (
+        {(activeFilters > 0 || (!inForum && posts.status === 'success')) && (
           <div className="mb-4 flex flex-wrap items-center gap-2">
             {subject && (
               <Chip onRemove={() => setFilters({ subjectId: null })} removeLabel={`Quitar filtro ${subject.name}`}>
@@ -148,12 +155,16 @@ export function HomePage() {
               </button>
             )}
             <p className="ml-auto text-xs text-ink-muted" aria-live="polite">
-              {posts.status === 'success' && pluralize(posts.total, 'recurso', 'recursos')}
+              {!inForum && posts.status === 'success' && pluralize(posts.total, 'recurso', 'recursos')}
             </p>
           </div>
         )}
 
-        <PostList posts={posts} empty={empty} label={onlyFavorites ? 'Publicaciones de tus favoritos' : 'Publicaciones recientes'} />
+        {inForum ? (
+          <ForumPanel subjectId={filters.subjectId} careerId={filters.careerId} authorId={filters.authorId} q={filters.q} />
+        ) : (
+          <PostList posts={posts} empty={empty} label={onlyFavorites ? 'Publicaciones de tus favoritos' : 'Publicaciones recientes'} />
+        )}
       </TabPanel>
     </div>
   );
