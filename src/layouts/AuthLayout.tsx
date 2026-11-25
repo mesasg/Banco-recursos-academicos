@@ -4,9 +4,9 @@ import { Logo } from '@/components/Logo';
 import { APP_NAME } from '@/config';
 
 const highlights = [
-  { icon: BookOpenCheck, text: 'Apuntes, diagramas, PDFs y enlaces para cada estilo de aprendizaje.' },
-  { icon: MessagesSquare, text: 'Foros por materia para resolver dudas entre compañeros.' },
-  { icon: Star, text: 'Valoraciones que te muestran qué recursos sí sirven.' },
+  { icon: BookOpenCheck, text: 'Apuntes, diagramas, PDFs y enlaces para cada estilo de aprendizaje' },
+  { icon: MessagesSquare, text: 'Foros para resolver dudas entre compañeros' },
+  { icon: Star, text: 'Califica los recursos compartidos' },
 ];
 
 /** Pantallas sin sesión: tarjeta centrada y, en desktop, un panel ilustrativo de marca. */
@@ -21,7 +21,7 @@ export function AuthLayout() {
         <div className="relative z-10">
           {/* Texto grande (≥24 px) en blanco sobre primary-500: cumple AA para texto grande. */}
           <p className="text-3xl font-semibold leading-tight xl:text-4xl">
-            Aprende con lo que comparten tus compañeros.
+            Aprende con lo que comparten tus compañeros
           </p>
           <ul className="mt-8 space-y-3">
             {highlights.map(({ icon: Icon, text }) => (
@@ -32,7 +32,10 @@ export function AuthLayout() {
             ))}
           </ul>
         </div>
-        <p className="relative z-10 text-lg font-semibold">Facultad de Ingeniería</p>
+        <div className="relative z-10">
+          <p className="text-lg font-semibold">Facultad de Ingeniería</p>
+          <p className="text-lg font-semibold">Universidad de Antioquia</p>
+        </div>
 
         {/* Decoración */}
         <svg className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 opacity-20" viewBox="0 0 200 200" aria-hidden>

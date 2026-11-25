@@ -3,8 +3,6 @@ import { Link, useLocation, useNavigate, type Location } from 'react-router-dom'
 import { AlertCircle, Eye, EyeOff, Info, Lock, Mail } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
-import { Logo } from '@/components/Logo';
-import { APP_NAME, APP_TAGLINE } from '@/config';
 import { useAuth } from '@/context/AuthContext';
 import { DEMO_EMAIL, DEMO_PASSWORD } from '@/mocks/users';
 import { errorMessage } from '@/services';
@@ -58,11 +56,7 @@ export function LoginPage() {
     <div className="w-full max-w-md">
       <div className="card px-5 py-8 sm:px-8">
         <div className="flex flex-col items-center text-center">
-          <Logo tone="dark" />
-          <h1 className="mt-5 text-2xl font-semibold text-ink">Inicia sesión</h1>
-          <p className="mt-1.5 text-sm text-ink-muted">
-            {APP_TAGLINE}: comparte y encuentra recursos de tus materias en {APP_NAME}.
-          </p>
+          <h1 className="text-2xl font-semibold text-ink">Inicia sesión</h1>
         </div>
 
         {formError && (

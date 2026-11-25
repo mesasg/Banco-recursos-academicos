@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AlertCircle, Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
-import { Logo } from '@/components/Logo';
 import { Select } from '@/components/Select';
 import { useToast } from '@/components/Toast';
 import { APP_NAME } from '@/config';
@@ -89,8 +88,7 @@ export function RegisterPage() {
     <div className="w-full max-w-md">
       <div className="card px-5 py-8 sm:px-8">
         <div className="flex flex-col items-center text-center">
-          <Logo tone="dark" />
-          <h1 className="mt-5 text-2xl font-semibold text-ink">Crear cuenta</h1>
+          <h1 className="text-2xl font-semibold text-ink">Crear cuenta</h1>
           <p className="mt-1.5 text-sm text-ink-muted">Únete para compartir y encontrar recursos de tus materias.</p>
         </div>
 
