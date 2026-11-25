@@ -12,7 +12,6 @@ import { SubjectSidebar } from '@/features/feed/SubjectSidebar';
 import { useFeedFilters } from '@/features/feed/useFeedFilters';
 import { usePostFormNavigation } from '@/features/posts/usePostFormNavigation';
 import { breakpoints, useMediaQuery } from '@/hooks/useMediaQuery';
-import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 import { Header } from './Header';
 import { RightAside } from './RightAside';
 
@@ -21,7 +20,7 @@ const SIDEBAR_ID = 'sidebar-materias';
 /**
  * Estructura principal (mock-up): header fijo, sidebar de carreras a la
  * izquierda, contenido al centro y accesos rápidos a la derecha.
- *  ≥1280: 3 columnas · 1024–1279: sidebar colapsable, "Añadir" en el header
+ *  ≥1280: 3 columnas · 1024–1279: sidebar fijo, "Añadir" en el header
  *  <1024: sidebar en drawer y botón flotante (FAB).
  */
 export function AppLayout() {
@@ -34,7 +33,6 @@ export function AppLayout() {
   const { openCreate } = usePostFormNavigation();
 
   const isDesktop = useMediaQuery(breakpoints.lg);
-  const [collapsed, setCollapsed] = useLocalStorageState('ingenotes:sidebar-collapsed', false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Al pasar a desktop el drawer no tiene sentido.
@@ -65,15 +63,17 @@ export function AppLayout() {
       <Header
         user={user}
         isDesktop={isDesktop}
-        sidebarOpen={isDesktop ? !collapsed : drawerOpen}
+        sidebarOpen={drawerOpen}
         sidebarId={SIDEBAR_ID}
-        onToggleSidebar={() => (isDesktop ? setCollapsed((c) => !c) : setDrawerOpen(true))}
+        onToggleSidebar={() => setDrawerOpen(true)}
         onAddResource={addResource}
         onLogout={handleLogout}
       />
 
-      <div className="mx-auto flex w-full max-w-[1440px]">
-        {isDesktop && !collapsed && (
+      {/* El sidebar va pegado al borde izquierdo; contenido y columna derecha se centran en el resto
+          (máx. 1180 px). Así se ve bien en pantallas muy anchas o con el zoom alejado. */}
+      <div className="flex w-full">
+        {isDesktop && (
           <aside
             id={SIDEBAR_ID}
             aria-label="Materias"
@@ -88,11 +88,13 @@ export function AppLayout() {
           </aside>
         )}
 
-        <main id="contenido" tabIndex={-1} className="min-w-0 flex-1 px-4 pb-28 pt-4 focus:outline-none md:px-6 md:pt-6 lg:px-8 lg:pb-10">
-          <Outlet />
-        </main>
+        <div className="mx-auto flex w-full min-w-0 max-w-[1180px]">
+          <main id="contenido" tabIndex={-1} className="min-w-0 flex-1 px-4 pb-28 pt-4 focus:outline-none md:px-6 md:pt-6 lg:px-8 lg:pb-10">
+            <Outlet />
+          </main>
 
-        <RightAside onAddResource={addResource} className="hidden xl:flex" />
+          <RightAside onAddResource={addResource} className="hidden xl:flex" />
+        </div>
       </div>
 
       {!isDesktop && (

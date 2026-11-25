@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, LayoutGrid, Search, X } from 'lucide-react';
+import { LayoutGrid, Search, X } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { Skeleton } from '@/components/Skeleton';
-import { useAuth } from '@/context/AuthContext';
 import { useCatalog } from '@/context/CatalogContext';
 import type { Career } from '@/types';
 import { cn, normalize } from '@/utils/text';
@@ -33,22 +32,14 @@ function CountBadge({ value, active }: { value: number; active?: boolean }) {
   );
 }
 
-/** Lista de carreras (acordeón) con sus materias. Funciona como filtro del feed. */
+/** Lista fija de carreras con sus materias. Funciona como filtro del feed. */
 export function SubjectSidebar({ onNavigate }: SubjectSidebarProps) {
-  const { careers, loading, error, reload, findSubject } = useCatalog();
-  const { user } = useAuth();
+  const { careers, loading, error, reload } = useCatalog();
   const { filters, feedHref, onFeed } = useFeedFilters();
   const [search, setSearch] = useState('');
-  const [expanded, setExpanded] = useState<Set<string>>(() => new Set(user ? [user.careerId] : []));
 
   const activeSubject = onFeed ? filters.subjectId : null;
   const activeCareer = onFeed ? filters.careerId : null;
-
-  // Abre la carrera del filtro activo (p. ej. al llegar con un enlace /?materia=...).
-  const activeCareerId = findSubject(activeSubject)?.careerId ?? activeCareer;
-  useEffect(() => {
-    if (activeCareerId) setExpanded((prev) => (prev.has(activeCareerId) ? prev : new Set(prev).add(activeCareerId)));
-  }, [activeCareerId]);
 
   const term = normalize(search);
   const visible = useMemo<Career[]>(() => {
@@ -61,14 +52,6 @@ export function SubjectSidebar({ onNavigate }: SubjectSidebarProps) {
   }, [careers, term]);
 
   const total = careers.reduce((sum, c) => sum + c.subjects.reduce((s, x) => s + x.postCount, 0), 0);
-
-  const toggle = (id: string) =>
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
 
   return (
     <nav aria-label="Carreras y materias" className="flex flex-col gap-3 p-3">
@@ -136,60 +119,45 @@ export function SubjectSidebar({ onNavigate }: SubjectSidebarProps) {
 
       <ul className="flex flex-col gap-1">
         {visible.map((career) => {
-          const isOpen = Boolean(term) || expanded.has(career.id);
-          const listId = `career-${career.id}`;
+          const headingId = `career-${career.id}`;
           const count = career.subjects.reduce((s, x) => s + x.postCount, 0);
           const careerActive = activeCareer === career.id;
           return (
             <li key={career.id}>
-              <h3>
-                <button
-                  type="button"
-                  onClick={() => toggle(career.id)}
-                  aria-expanded={isOpen}
-                  aria-controls={listId}
-                  className="flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-sm font-semibold text-ink hover:bg-primary-100/60"
-                >
-                  <ChevronDown
-                    className={cn('h-4 w-4 shrink-0 text-ink-muted transition-transform', !isOpen && '-rotate-90')}
-                    aria-hidden
-                  />
-                  <span className="flex-1">{career.name}</span>
-                </button>
+              <h3 id={headingId} className="flex min-h-9 items-center px-3 pt-1 text-sm font-semibold text-ink">
+                {career.name}
               </h3>
-              {isOpen && (
-                <ul id={listId} className="ml-5 mt-0.5 flex flex-col gap-0.5 border-l border-line pl-2">
-                  {!term && (
-                    <li>
+              <ul aria-labelledby={headingId} className="ml-3 mt-0.5 flex flex-col gap-0.5 border-l border-line pl-2">
+                {!term && (
+                  <li>
+                    <Link
+                      to={feedHref({ careerId: career.id })}
+                      onClick={onNavigate}
+                      aria-current={careerActive ? 'page' : undefined}
+                      className={itemClass(careerActive)}
+                    >
+                      <span className="flex-1">Todo {career.shortName}</span>
+                      <CountBadge value={count} active={careerActive} />
+                    </Link>
+                  </li>
+                )}
+                {career.subjects.map((subject) => {
+                  const active = activeSubject === subject.id;
+                  return (
+                    <li key={subject.id}>
                       <Link
-                        to={feedHref({ careerId: career.id })}
+                        to={feedHref({ subjectId: subject.id })}
                         onClick={onNavigate}
-                        aria-current={careerActive ? 'page' : undefined}
-                        className={itemClass(careerActive)}
+                        aria-current={active ? 'page' : undefined}
+                        className={itemClass(active)}
                       >
-                        <span className="flex-1">Todo {career.shortName}</span>
-                        <CountBadge value={count} active={careerActive} />
+                        <span className="flex-1">{subject.name}</span>
+                        <CountBadge value={subject.postCount} active={active} />
                       </Link>
                     </li>
-                  )}
-                  {career.subjects.map((subject) => {
-                    const active = activeSubject === subject.id;
-                    return (
-                      <li key={subject.id}>
-                        <Link
-                          to={feedHref({ subjectId: subject.id })}
-                          onClick={onNavigate}
-                          aria-current={active ? 'page' : undefined}
-                          className={itemClass(active)}
-                        >
-                          <span className="flex-1">{subject.name}</span>
-                          <CountBadge value={subject.postCount} active={active} />
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
+                  );
+                })}
+              </ul>
             </li>
           );
         })}

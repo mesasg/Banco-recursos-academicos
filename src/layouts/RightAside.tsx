@@ -39,7 +39,7 @@ export function RightAside({ onAddResource, className }: { onAddResource: () => 
           </div>
         ) : favorites.length === 0 ? (
           <p className="mt-3 text-sm text-ink-muted">
-            Marca la estrella junto al nombre de un autor para seguir sus recursos desde aquí.
+            Marca la estrella junto al nombre de un autor para seguir sus recursos desde aquí
           </p>
         ) : (
           <ul className="mt-2 -mx-2">

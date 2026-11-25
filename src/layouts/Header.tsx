@@ -1,5 +1,5 @@
 import { Link, NavLink } from 'react-router-dom';
-import { LogOut, Menu as MenuIcon, PanelLeftClose, PanelLeftOpen, Plus } from 'lucide-react';
+import { LogOut, Menu as MenuIcon, Plus } from 'lucide-react';
 import { Avatar } from '@/components/Avatar';
 import { Logo } from '@/components/Logo';
 import { APP_NAME } from '@/config';
@@ -8,7 +8,7 @@ import { cn } from '@/utils/text';
 
 interface HeaderProps {
   user: User;
-  /** En desktop el botón colapsa el sidebar; en móvil/tablet abre el drawer. */
+  /** En móvil/tablet el botón de menú abre el drawer de materias; en desktop no se muestra. */
   isDesktop: boolean;
   sidebarOpen: boolean;
   sidebarId: string;
@@ -21,22 +21,23 @@ const iconButton =
   'inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-white transition-colors hover:bg-white/15';
 
 export function Header({ user, isDesktop, sidebarOpen, sidebarId, onToggleSidebar, onAddResource, onLogout }: HeaderProps) {
-  const ToggleIcon = isDesktop ? (sidebarOpen ? PanelLeftClose : PanelLeftOpen) : MenuIcon;
-
   return (
     <header className="on-brand sticky top-0 z-40 h-16 bg-primary-500 shadow-sm">
-      <div className="mx-auto flex h-full max-w-[1440px] items-center gap-2 px-2 md:px-4">
-        <button
-          type="button"
-          onClick={onToggleSidebar}
-          aria-expanded={sidebarOpen}
-          aria-controls={sidebarId}
-          aria-label={isDesktop ? (sidebarOpen ? 'Ocultar materias' : 'Mostrar materias') : 'Abrir menú de materias'}
-          title={isDesktop ? (sidebarOpen ? 'Ocultar materias' : 'Mostrar materias') : undefined}
-          className={iconButton}
-        >
-          <ToggleIcon className="h-6 w-6" aria-hidden />
-        </button>
+      {/* Ancho completo para que el logo quede alineado con el sidebar, pegado a la izquierda. */}
+      <div className="flex h-full items-center gap-2 px-2 md:px-4">
+        {/* En desktop las materias siempre están visibles; el botón solo existe en móvil/tablet. */}
+        {!isDesktop && (
+          <button
+            type="button"
+            onClick={onToggleSidebar}
+            aria-expanded={sidebarOpen}
+            aria-controls={sidebarId}
+            aria-label="Abrir menú de materias"
+            className={iconButton}
+          >
+            <MenuIcon className="h-6 w-6" aria-hidden />
+          </button>
+        )}
 
         <Link to="/" aria-label={`${APP_NAME}, ir al inicio`} className="rounded-lg px-1 py-1">
           <Logo />
