@@ -55,7 +55,7 @@ export function Modal({
         fullScreenOnMobile ? 'items-stretch md:items-center md:p-6' : 'items-end p-0 sm:items-center sm:p-6',
       )}
     >
-      <div className="absolute inset-0 animate-fade-in bg-ink/50" onClick={onClose} aria-hidden />
+      <div className="absolute inset-0 animate-fade-in bg-backdrop/50" onClick={onClose} aria-hidden />
       <div
         ref={panelRef}
         role={role}

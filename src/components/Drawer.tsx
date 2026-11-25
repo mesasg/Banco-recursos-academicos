@@ -24,7 +24,7 @@ export function Drawer({ open, onClose, title, header, children, footer, id }: D
 
   return createPortal(
     <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 animate-fade-in bg-ink/50" onClick={onClose} aria-hidden />
+      <div className="absolute inset-0 animate-fade-in bg-backdrop/50" onClick={onClose} aria-hidden />
       <div
         ref={panelRef}
         id={id}

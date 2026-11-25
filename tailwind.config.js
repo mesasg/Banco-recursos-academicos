@@ -22,10 +22,22 @@ export default {
           DEFAULT: token('ink'),
           muted: token('ink-muted'),
         },
+        backdrop: token('backdrop'),
         success: token('success'),
         'success-strong': token('success-strong'),
         danger: token('danger'),
         warning: token('warning'),
+      },
+      // Como texto, estos tonos usan su variante *-text (más clara en modo oscuro).
+      textColor: {
+        primary: {
+          600: token('primary-600-text'),
+          700: token('primary-700-text'),
+        },
+        success: token('success-text'),
+        'success-strong': token('success-strong-text'),
+        danger: token('danger-text'),
+        warning: token('warning-text'),
       },
       fontFamily: {
         sans: ['"Inter Variable"', 'Inter', 'system-ui', '-apple-system', '"Segoe UI"', 'Roboto', 'sans-serif'],

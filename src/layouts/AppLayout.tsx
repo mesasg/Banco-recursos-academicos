@@ -5,6 +5,7 @@ import { Avatar } from '@/components/Avatar';
 import { buttonClasses } from '@/components/Button';
 import { Drawer } from '@/components/Drawer';
 import { Logo } from '@/components/Logo';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { useToast } from '@/components/Toast';
 import { useAuth, useCurrentUser } from '@/context/AuthContext';
 import { SubjectSidebar } from '@/features/feed/SubjectSidebar';
@@ -76,9 +77,14 @@ export function AppLayout() {
           <aside
             id={SIDEBAR_ID}
             aria-label="Materias"
-            className="scrollbar-thin sticky top-16 h-[calc(100vh-4rem)] w-[260px] shrink-0 overflow-y-auto border-r border-line bg-primary-50"
+            className="sticky top-16 flex h-[calc(100vh-4rem)] w-[260px] shrink-0 flex-col border-r border-line bg-primary-50"
           >
-            <SubjectSidebar />
+            <div className="scrollbar-thin min-h-0 flex-1 overflow-y-auto">
+              <SubjectSidebar />
+            </div>
+            <div className="border-t border-line p-3">
+              <ThemeToggle />
+            </div>
           </aside>
         )}
 
@@ -98,6 +104,7 @@ export function AppLayout() {
           header={<Logo />}
           footer={
             <div className="flex flex-col gap-2">
+              <ThemeToggle className="px-2" />
               <Link to="/cuenta" className="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-canvas">
                 <Avatar name={user.name} src={user.avatarUrl} size="sm" />
                 <span className="min-w-0 flex-1">

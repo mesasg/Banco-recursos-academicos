@@ -10,6 +10,23 @@
       content="Banco estudiantil de recursos académicos de la Facultad de Ingeniería: apuntes, diagramas, PDFs y foros por materia."
     />
     <title>IngeNotes · Banco estudiantil de recursos</title>
+    <script>
+      // Aplica el tema antes de pintar para evitar un destello claro (ver src/hooks/useTheme.ts).
+      // Usa lo último elegido en este navegador o, si no hay, el modo del navegador/sistema.
+      (function () {
+        var theme;
+        try {
+          theme = localStorage.getItem('ingenotes:theme');
+        } catch (e) {}
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#2A5566');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

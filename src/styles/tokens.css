@@ -6,8 +6,14 @@
  *  - primary-500 + blanco = 3,4:1 → solo texto grande (≥18px seminegrita) e íconos.
  *  - primary-600 + blanco = 5,2:1 → botones con texto normal.
  *  - primary-700 + blanco = 7,3:1 → hover / pressed.
+ *
+ * Los tokens *-text son el color de esos tonos cuando se usan como texto
+ * (text-primary-700, text-danger…). En modo claro son iguales al fondo;
+ * en modo oscuro se aclaran para seguir siendo legibles sobre superficies oscuras.
  */
 :root {
+  color-scheme: light;
+
   --color-primary-50: 243 248 250; /* #F3F8FA */
   --color-primary-100: 230 240 244; /* #E6F0F4 */
   --color-primary-500: 91 147 168; /* #5B93A8 */
@@ -19,11 +25,49 @@
   --color-line: 226 230 234; /* #E2E6EA */
   --color-ink: 31 41 51; /* #1F2933 */
   --color-ink-muted: 95 107 118; /* #5F6B76 */
+  --color-backdrop: 31 41 51; /* fondo de modales y drawer */
 
   --color-success: 46 139 87; /* #2E8B57 */
   --color-success-strong: 30 107 65; /* #1E6B41 · texto verde sobre fondos claros (AA) */
   --color-danger: 192 57 43; /* #C0392B */
   --color-warning: 217 130 43; /* #D9822B */
 
+  --color-primary-600-text: var(--color-primary-600);
+  --color-primary-700-text: var(--color-primary-700);
+  --color-success-text: var(--color-success);
+  --color-success-strong-text: var(--color-success-strong);
+  --color-danger-text: var(--color-danger);
+  --color-warning-text: var(--color-warning);
+
   --header-height: 64px;
+}
+
+/* Modo oscuro: se activa con la clase .dark en <html> (ver index.html y useTheme). */
+:root.dark {
+  color-scheme: dark;
+
+  --color-primary-50: 21 35 43; /* #15232B · fondo del sidebar */
+  --color-primary-100: 30 52 63; /* #1E343F · seleccionado / hover */
+  --color-primary-500: 42 85 102; /* #2A5566 · header (blanco = 7,9:1) */
+  --color-primary-600: 63 116 137; /* #3F7489 · botones (blanco = 5,2:1) */
+  --color-primary-700: 47 92 110; /* #2F5C6E */
+
+  --color-canvas: 15 20 25; /* #0F1419 */
+  --color-surface: 26 33 41; /* #1A2129 */
+  --color-line: 48 58 68; /* #303A44 */
+  --color-ink: 230 234 238; /* #E6EAEE */
+  --color-ink-muted: 156 168 180; /* #9CA8B4 */
+  --color-backdrop: 0 0 0;
+
+  --color-success: 52 160 100; /* #34A064 */
+  --color-success-strong: 52 160 100;
+  --color-danger: 192 57 43; /* #C0392B · fondo de botones peligrosos */
+  --color-warning: 217 130 43;
+
+  --color-primary-600-text: 142 195 214; /* #8EC3D6 */
+  --color-primary-700-text: 169 211 226; /* #A9D3E2 */
+  --color-success-text: 111 208 154; /* #6FD09A */
+  --color-success-strong-text: 111 208 154;
+  --color-danger-text: 242 139 128; /* #F28B80 */
+  --color-warning-text: 240 168 90; /* #F0A85A */
 }

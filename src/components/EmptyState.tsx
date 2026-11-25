@@ -40,7 +40,7 @@ function Art({ kind }: { kind: Illustration }) {
       )}
       {kind === 'error' && (
         <g strokeWidth="3" stroke={stroke} strokeLinecap="round">
-          <path d="M80 18l50 84H30z" fill="#FBEAE8" strokeLinejoin="round" />
+          <path d="M80 18l50 84H30z" fill="rgb(var(--color-danger) / 0.12)" strokeLinejoin="round" />
           <path d="M80 50v24" />
           <circle cx="80" cy="86" r="2" fill={stroke} />
         </g>
