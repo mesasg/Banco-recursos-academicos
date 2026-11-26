@@ -30,13 +30,15 @@ type Body = BodyInit | Record<string, unknown> | unknown[] | undefined;
 
 async function request<T>(method: string, path: string, body?: Body, init?: RequestInit): Promise<T> {
   const isJson = body !== undefined && !(body instanceof FormData) && !(body instanceof Blob);
+  // Token con el que sale esta petición (puede cambiar mientras llega la respuesta).
+  const sentToken = authToken;
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
     method,
     headers: {
       Accept: 'application/json',
       ...(isJson ? { 'Content-Type': 'application/json' } : {}),
-      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      ...(sentToken ? { Authorization: `Bearer ${sentToken}` } : {}),
       ...init?.headers,
     },
     body: isJson ? JSON.stringify(body) : (body as BodyInit | undefined),
@@ -50,8 +52,9 @@ async function request<T>(method: string, path: string, body?: Body, init?: Requ
           ? 'No tienes permiso para hacer esto.'
           : 'Ocurrió un error inesperado. Intenta de nuevo.';
     let code: string | undefined;
-    if (response.status === 401 && authToken) {
-      // Token vencido o inválido: avisamos para cerrar la sesión.
+    // Solo se cierra la sesión si se rechazó el token vigente (vencido o inválido).
+    // Un 401 de una petición enviada sin token, o con un token anterior, no cuenta.
+    if (response.status === 401 && sentToken && sentToken === authToken) {
       window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
     }
     try {

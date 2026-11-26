@@ -43,6 +43,11 @@ function clearStored(): void {
   }
 }
 
+// Al cargar la app se recupera el token guardado antes de cualquier petición,
+// para que las primeras llamadas (catálogo, recursos) ya salgan autenticadas.
+const initialSession = readStored();
+if (initialSession) setAuthToken(initialSession.token);
+
 /** Id del usuario de la sesión activa. */
 export function currentUserId(): string {
   const stored = readStored();
