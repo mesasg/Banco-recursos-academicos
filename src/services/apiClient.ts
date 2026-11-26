@@ -28,6 +28,28 @@ export function setAuthToken(token: string | null): void {
 
 type Body = BodyInit | Record<string, unknown> | unknown[] | undefined;
 
+const ME_PATH = '/api/auth/me';
+
+/**
+ * Un 401 en un endpoint concreto no siempre significa que la sesión venció
+ * (p. ej. una ruta que aún no existe en el servidor). Antes de cerrar la
+ * sesión se confirma con /api/auth/me usando el mismo token.
+ */
+async function confirmSessionExpired(token: string, path: string): Promise<void> {
+  let expired = path === ME_PATH;
+  if (!expired) {
+    try {
+      const check = await fetch(`${API_BASE_URL}${ME_PATH}`, {
+        headers: { Accept: 'application/json', Authorization: `Bearer ${token}` },
+      });
+      expired = check.status === 401;
+    } catch {
+      expired = false; // Sin conexión: no se cierra la sesión.
+    }
+  }
+  if (expired && token === authToken) window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
+}
+
 async function request<T>(method: string, path: string, body?: Body, init?: RequestInit): Promise<T> {
   const isJson = body !== undefined && !(body instanceof FormData) && !(body instanceof Blob);
   // Token con el que sale esta petición (puede cambiar mientras llega la respuesta).
@@ -55,7 +77,7 @@ async function request<T>(method: string, path: string, body?: Body, init?: Requ
     // Solo se cierra la sesión si se rechazó el token vigente (vencido o inválido).
     // Un 401 de una petición enviada sin token, o con un token anterior, no cuenta.
     if (response.status === 401 && sentToken && sentToken === authToken) {
-      window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
+      void confirmSessionExpired(sentToken, path);
     }
     try {
       // El backend responde los errores como { "mensaje": "..." }.
