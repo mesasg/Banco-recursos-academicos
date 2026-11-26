@@ -73,7 +73,11 @@ export function AttachmentsField({ items, onAddFiles, onAddLink, onRemove, onRet
           {' '}*
         </span>
         <span className="ml-1 font-normal text-ink-muted">
-          {MAX_ATTACHMENTS === 1 ? '(un PDF o una imagen)' : '(al menos uno)'}
+          {MAX_ATTACHMENTS === 1
+            ? FEATURES.links
+              ? '(un archivo o un enlace)'
+              : '(un PDF o una imagen)'
+            : '(al menos uno)'}
         </span>
       </legend>
 
