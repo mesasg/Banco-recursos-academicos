@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { catalogService, errorMessage } from '@/services';
 import type { Career, Subject } from '@/types';
+import { useAuth } from './AuthContext';
 import { useDataSync } from './DataSyncContext';
 
 interface CatalogValue {
@@ -17,6 +18,9 @@ const CatalogContext = createContext<CatalogValue | null>(null);
 /** Carreras y materias (con su número de publicaciones), compartidas por toda la app. */
 export function CatalogProvider({ children }: { children: ReactNode }) {
   const { postsVersion } = useDataSync();
+  // Las materias solo se pueden pedir con sesión: se recargan al iniciar o cerrar sesión.
+  const { user } = useAuth();
+  const userId = user?.id ?? null;
   const [careers, setCareers] = useState<Career[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +37,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
     };
-  }, [postsVersion, attempt]);
+  }, [postsVersion, attempt, userId]);
 
   const reload = useCallback(() => {
     setLoading(true);

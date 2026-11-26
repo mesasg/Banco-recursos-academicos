@@ -81,6 +81,7 @@ export async function register(input: RegisterInput): Promise<Session> {
       nombre: `${input.firstName.trim()} ${input.lastName.trim()}`.trim(),
       correo: input.email.trim().toLowerCase(),
       contrasena: input.password,
+      idCarrera: input.careerId || null,
     });
   } catch (error) {
     if (error instanceof ApiError && error.status === 409 && /registrado/i.test(error.message)) {

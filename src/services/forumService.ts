@@ -1,7 +1,8 @@
 import type { ForumReply, ForumThread, ForumThreadDetail, Page, ThreadInput, ThreadQuery } from '@/types';
 import { normalize } from '@/utils/text';
 import { api, ApiError } from './apiClient';
-import { toReply, toThread, type HiloDto, type RespuestaDto } from './mappers';
+import { ensureCareers } from './catalogService';
+import { subjectIdsOfCareer, toReply, toThread, type HiloDto, type RespuestaDto } from './mappers';
 
 /**
  * Foros de preguntas y respuestas por materia, contra el backend:
@@ -30,10 +31,11 @@ export async function getThreads(query: ThreadQuery = {}): Promise<Page<ForumThr
   const params = new URLSearchParams({ pagina: '0', tamano: String(MAX_FETCH) });
   if (query.subjectId) params.set('idAsignatura', query.subjectId);
 
-  const data = await api.get<PaginaDto>(`/api/foros/hilos?${params.toString()}`);
+  const [data] = await Promise.all([api.get<PaginaDto>(`/api/foros/hilos?${params.toString()}`), ensureCareers()]);
+  const careerSubjects = query.careerId ? subjectIdsOfCareer(query.careerId) : null;
   const filtered = data.contenido
     .map(toThread)
-    .filter((t) => !query.careerId || t.career.id === query.careerId)
+    .filter((t) => !careerSubjects || careerSubjects.has(t.subject.id))
     .filter((t) => !query.authorId || t.author.id === query.authorId)
     .filter((t) => {
       if (terms.length === 0) return true;
@@ -53,7 +55,10 @@ export async function getThreads(query: ThreadQuery = {}): Promise<Page<ForumThr
 }
 
 export async function getThread(id: string): Promise<ForumThreadDetail> {
-  const data = await api.get<{ hilo: HiloDto; respuestas: RespuestaDto[] }>(`/api/foros/hilos/${id}`);
+  const [data] = await Promise.all([
+    api.get<{ hilo: HiloDto; respuestas: RespuestaDto[] }>(`/api/foros/hilos/${id}`),
+    ensureCareers(),
+  ]);
   const replies = data.respuestas.map(toReply);
   const thread = toThread(data.hilo);
   const last = replies.reduce((latest, r) => (r.createdAt > latest ? r.createdAt : latest), thread.createdAt);

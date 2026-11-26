@@ -2,7 +2,8 @@ import { ACCEPTED_FILE_TYPES, FEED_PAGE_SIZE, MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE
 import type { Attachment, Page, Post, PostInput, PostQuery } from '@/types';
 import { normalize } from '@/utils/text';
 import { api, ApiError } from './apiClient';
-import { toPost, type RecursoDto } from './mappers';
+import { ensureCareers } from './catalogService';
+import { subjectIdsOfCareer, toPost, type RecursoDto } from './mappers';
 
 /**
  * Recursos académicos contra el backend:
@@ -15,7 +16,7 @@ import { toPost, type RecursoDto } from './mappers';
 
 async function fetchAll(subjectId?: string): Promise<Post[]> {
   const path = subjectId ? `/api/recursos?idAsignatura=${encodeURIComponent(subjectId)}` : '/api/recursos';
-  const recursos = await api.get<RecursoDto[]>(path);
+  const [recursos] = await Promise.all([api.get<RecursoDto[]>(path), ensureCareers()]);
   return recursos.map(toPost).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
@@ -30,8 +31,10 @@ export async function getPosts(query: PostQuery = {}): Promise<Page<Post>> {
   const pageSize = query.pageSize ?? FEED_PAGE_SIZE;
   const terms = normalize(query.q ?? '').split(/\s+/).filter(Boolean);
 
+  const careerSubjects = query.careerId ? subjectIdsOfCareer(query.careerId) : null;
   const filtered = (await fetchAll(query.subjectId))
-    .filter((p) => !query.careerId || p.career.id === query.careerId)
+    // Una carrera agrupa los recursos de todas sus materias.
+    .filter((p) => !careerSubjects || careerSubjects.has(p.subject.id))
     .filter((p) => !query.authorId || p.author.id === query.authorId)
     .filter((p) => matchesQuery(p, terms));
 
