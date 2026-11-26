@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, type Location } from 'react-router-dom'
 import { AlertCircle, Eye, EyeOff, Info, Lock, Mail } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
+import { FEATURES } from '@/config';
 import { useAuth } from '@/context/AuthContext';
 import { DEMO_EMAIL, DEMO_PASSWORD } from '@/mocks/users';
 import { errorMessage } from '@/services';
@@ -115,9 +116,11 @@ export function LoginPage() {
               />
               Recordarme
             </label>
-            <Link to="/recuperar" className="inline-flex min-h-11 items-center rounded text-sm font-semibold text-primary-700 hover:underline">
-              ¿Olvidaste tu contraseña?
-            </Link>
+            {FEATURES.passwordReset && (
+              <Link to="/recuperar" className="inline-flex min-h-11 items-center rounded text-sm font-semibold text-primary-700 hover:underline">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            )}
           </div>
 
           <Button type="submit" size="lg" fullWidth loading={submitting} loadingLabel="Iniciando sesión…">
@@ -133,7 +136,8 @@ export function LoginPage() {
         </p>
       </div>
 
-      {/* Ayuda del modo mock: se elimina al conectar el backend. */}
+      {/* Ayuda del modo mock: oculta mientras FEATURES.demoAccount sea false. */}
+      {FEATURES.demoAccount && (
       <div className="mt-4 flex items-start gap-2 rounded-lg border border-line bg-surface p-3 text-xs text-ink-muted">
         <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" aria-hidden />
         <p>
@@ -151,6 +155,7 @@ export function LoginPage() {
           </button>
         </p>
       </div>
+      )}
     </div>
   );
 }

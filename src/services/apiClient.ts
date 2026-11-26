@@ -19,6 +19,9 @@ export class ApiError extends Error {
 
 let authToken: string | null = null;
 
+/** Se emite cuando el backend rechaza el token (401). */
+export const UNAUTHORIZED_EVENT = 'ingenotes:unauthorized';
+
 export function setAuthToken(token: string | null): void {
   authToken = token;
 }
@@ -40,11 +43,21 @@ async function request<T>(method: string, path: string, body?: Body, init?: Requ
   });
 
   if (!response.ok) {
-    let message = 'Ocurrió un error inesperado. Intenta de nuevo.';
+    let message =
+      response.status === 401
+        ? 'Tu sesión expiró. Inicia sesión de nuevo.'
+        : response.status === 403
+          ? 'No tienes permiso para hacer esto.'
+          : 'Ocurrió un error inesperado. Intenta de nuevo.';
     let code: string | undefined;
+    if (response.status === 401 && authToken) {
+      // Token vencido o inválido: avisamos para cerrar la sesión.
+      window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
+    }
     try {
-      const data = (await response.json()) as { message?: string; code?: string };
-      message = data.message ?? message;
+      // El backend responde los errores como { "mensaje": "..." }.
+      const data = (await response.json()) as { mensaje?: string; message?: string; code?: string };
+      message = data.mensaje ?? data.message ?? message;
       code = data.code;
     } catch {
       // Respuesta sin cuerpo JSON.

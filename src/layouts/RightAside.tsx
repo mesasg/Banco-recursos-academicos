@@ -3,6 +3,7 @@ import { Plus, Star } from 'lucide-react';
 import { Avatar } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 import { Skeleton } from '@/components/Skeleton';
+import { FEATURES } from '@/config';
 import { useFavorites } from '@/context/FavoritesContext';
 import { useFeedFilters } from '@/features/feed/useFeedFilters';
 import { cn } from '@/utils/text';
@@ -17,6 +18,8 @@ export function RightAside({ onAddResource, className }: { onAddResource: () => 
       aria-label="Accesos rápidos"
       className={cn('sticky top-16 h-[calc(100vh-4rem)] w-[280px] shrink-0 flex-col gap-4 overflow-y-auto p-4', className)}
     >
+      {/* Usuarios favoritos: oculto mientras FEATURES.favorites sea false. */}
+      {FEATURES.favorites && (
       <section className="card p-4" aria-labelledby="favorites-title">
         <div className="flex items-center justify-between">
           <h2 id="favorites-title" className="flex items-center gap-2 text-sm font-semibold text-ink">
@@ -68,6 +71,7 @@ export function RightAside({ onAddResource, className }: { onAddResource: () => 
           </ul>
         )}
       </section>
+      )}
 
       <div className="mt-auto">
         <Button size="lg" fullWidth onClick={onAddResource} leftIcon={<Plus className="h-5 w-5" aria-hidden />} className="shadow-raised">

@@ -10,6 +10,7 @@ import {
   Star,
   Trash2,
 } from 'lucide-react';
+import { FEATURES } from '@/config';
 import { useAuth } from '@/context/AuthContext';
 import { useFavorites } from '@/context/FavoritesContext';
 import { errorMessage, postService } from '@/services';
@@ -145,7 +146,7 @@ export function PostCard({ post, onEdit, onDelete, onFilterSubject, onFilterCare
               {post.author.name}
               {isMine && <span className="font-normal text-ink-muted"> (tú)</span>}
             </p>
-            {!isMine && (
+            {!isMine && FEATURES.favorites && (
               <button
                 type="button"
                 onClick={() => toggleFavorite(post.author)}
@@ -170,12 +171,12 @@ export function PostCard({ post, onEdit, onDelete, onFilterSubject, onFilterCare
             {post.updatedAt && <span> · editado</span>}
           </p>
         </div>
-        {isMine && (onEdit || onDelete) && (
+        {isMine && ((onEdit && FEATURES.editPost) || onDelete) && (
           <Menu
             label="Opciones de la publicación"
             trigger={<MoreHorizontal className="h-5 w-5" aria-hidden />}
             items={[
-              ...(onEdit ? [{ label: 'Editar', icon: <Pencil className="h-4 w-4" aria-hidden />, onSelect: () => onEdit(post) }] : []),
+              ...(onEdit && FEATURES.editPost ? [{ label: 'Editar', icon: <Pencil className="h-4 w-4" aria-hidden />, onSelect: () => onEdit(post) }] : []),
               ...(onDelete
                 ? [{ label: 'Eliminar', icon: <Trash2 className="h-4 w-4" aria-hidden />, onSelect: () => onDelete(post), tone: 'danger' as const }]
                 : []),

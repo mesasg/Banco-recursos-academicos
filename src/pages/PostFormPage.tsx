@@ -10,7 +10,7 @@ import { Modal } from '@/components/Modal';
 import { Select } from '@/components/Select';
 import { Textarea } from '@/components/Textarea';
 import { useToast } from '@/components/Toast';
-import { POST_DESCRIPTION_MAX, POST_TITLE_MAX } from '@/config';
+import { FEATURES, MAX_ATTACHMENTS, POST_DESCRIPTION_MAX, POST_TITLE_MAX } from '@/config';
 import { useCurrentUser } from '@/context/AuthContext';
 import { useCatalog } from '@/context/CatalogContext';
 import { useDataSync } from '@/context/DataSyncContext';
@@ -216,9 +216,11 @@ export function PostFormPage() {
       file,
       isNew: true,
     }));
-    setItems((list) => [...list, ...newItems]);
+    // Con MAX_ATTACHMENTS = 1 el archivo nuevo reemplaza al anterior.
+    const kept = newItems.slice(-MAX_ATTACHMENTS);
+    setItems((list) => [...list, ...kept].slice(-MAX_ATTACHMENTS));
     setTouched((t) => ({ ...t, attachments: true }));
-    newItems.forEach((item) => startUpload(item.key, item.file!));
+    kept.forEach((item) => startUpload(item.key, item.file!));
   };
 
   const addLink = (url: string) => {
@@ -358,6 +360,8 @@ export function PostFormPage() {
               error={show('title')}
             />
 
+            {/* Descripción: oculta mientras FEATURES.postDescription sea false. */}
+            {FEATURES.postDescription && (
             <Textarea
               label="Descripción breve"
               hint="Opcional. Cuenta qué incluye y para qué sirve."
@@ -368,6 +372,7 @@ export function PostFormPage() {
               onChange={(e) => set('description', e.target.value)}
               error={show('description')}
             />
+            )}
 
             <div className="grid gap-4 sm:grid-cols-2">
               <Select

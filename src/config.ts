@@ -2,15 +2,43 @@
 export const APP_NAME = 'IngeNotes';
 export const APP_TAGLINE = 'Banco estudiantil de recursos académicos';
 
-/** Tamaño máximo por archivo adjunto. */
-export const MAX_FILE_SIZE_MB = 10;
+/** Tamaño máximo por archivo adjunto (el backend acepta hasta 20 MB). */
+export const MAX_FILE_SIZE_MB = 20;
 export const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 export const ACCEPTED_FILE_TYPES: Record<string, 'pdf' | 'image'> = {
   'application/pdf': 'pdf',
   'image/png': 'image',
   'image/jpeg': 'image',
+  'image/webp': 'image',
+  'image/gif': 'image',
 };
-export const ACCEPTED_FILE_EXTENSIONS = '.pdf,.png,.jpg,.jpeg';
+export const ACCEPTED_FILE_EXTENSIONS = '.pdf,.png,.jpg,.jpeg,.webp,.gif';
+
+/** Un recurso del backend lleva exactamente un archivo. */
+export const MAX_ATTACHMENTS = 1;
+
+/** Carrera a la que pertenecen todas las asignaturas del backend. */
+export const CAREER_ID = 'sis';
+export const CAREER_NAME = 'Ingeniería de Sistemas';
+export const CAREER_SHORT_NAME = 'Ing. de Sistemas';
+
+/**
+ * Funciones disponibles en esta versión (MVP). Las que están en false no tienen
+ * soporte en el backend todavía: su código sigue en la interfaz pero se oculta.
+ * Para reactivar una, se implementa en el backend y se cambia aquí a true.
+ */
+export const FEATURES = {
+  /** Recuadro "Cuenta de prueba" del login (solo útil con datos mock). */
+  demoAccount: false,
+  favorites: false,
+  editPost: false,
+  postDescription: false,
+  links: false,
+  profileEdit: false,
+  changePassword: false,
+  deleteAccount: false,
+  passwordReset: false,
+} as const;
 
 /** Foto de perfil. */
 export const MAX_AVATAR_SIZE_MB = 2;

@@ -7,7 +7,7 @@ import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { useToast } from '@/components/Toast';
-import { MAX_AVATAR_SIZE_MB } from '@/config';
+import { FEATURES, MAX_AVATAR_SIZE_MB } from '@/config';
 import { useAuth, useCurrentUser } from '@/context/AuthContext';
 import { useCatalog } from '@/context/CatalogContext';
 import { authService, errorMessage, userService } from '@/services';
@@ -249,6 +249,8 @@ function SessionAndDanger() {
         </Button>
       </SettingsCard>
 
+      {/* Eliminar cuenta: oculto mientras FEATURES.deleteAccount sea false. */}
+      {FEATURES.deleteAccount && (
       <SettingsCard
         title="Zona de peligro"
         tone="danger"
@@ -258,6 +260,7 @@ function SessionAndDanger() {
           Eliminar cuenta
         </Button>
       </SettingsCard>
+      )}
 
       <ConfirmDialog
         open={confirmDelete}
@@ -275,8 +278,9 @@ function SessionAndDanger() {
 export function SettingsTab() {
   return (
     <div className="flex flex-col gap-4">
-      <ProfileForm />
-      <PasswordForm />
+      {/* Ocultos mientras sus FEATURES estén en false; el código sigue disponible. */}
+      {FEATURES.profileEdit && <ProfileForm />}
+      {FEATURES.changePassword && <PasswordForm />}
       <SessionAndDanger />
     </div>
   );

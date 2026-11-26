@@ -3,6 +3,7 @@ import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
 import { EmptyState } from '@/components/EmptyState';
 import { TabPanel, Tabs } from '@/components/Tabs';
+import { FEATURES } from '@/config';
 import { useCatalog } from '@/context/CatalogContext';
 import { useFavorites } from '@/context/FavoritesContext';
 import { SearchBar } from '@/features/feed/SearchBar';
@@ -120,7 +121,9 @@ export function HomePage() {
         className="mt-4 sm:[&>button]:flex-none"
         items={[
           { id: 'recientes', label: 'Recientes', icon: <Clock className="h-4 w-4" aria-hidden /> },
-          { id: 'favoritos', label: 'Favoritos', icon: <Star className="h-4 w-4" aria-hidden /> },
+          ...(FEATURES.favorites
+            ? [{ id: 'favoritos' as const, label: 'Favoritos', icon: <Star className="h-4 w-4" aria-hidden /> }]
+            : []),
           ...(forumAvailable
             ? [{ id: 'foro' as const, label: 'Foro', icon: <MessagesSquare className="h-4 w-4" aria-hidden /> }]
             : []),

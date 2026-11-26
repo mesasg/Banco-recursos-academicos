@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { authService } from '@/services';
+import { UNAUTHORIZED_EVENT } from '@/services/apiClient';
 import type { RegisterInput, User } from '@/types';
 
 type AuthStatus = 'loading' | 'authenticated' | 'anonymous';
@@ -59,6 +60,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     await authService.logout();
     clearSession();
+  }, [clearSession]);
+
+  // Si el backend rechaza el token (vencido o inválido), se cierra la sesión.
+  useEffect(() => {
+    const onUnauthorized = () => {
+      void authService.logout().then(clearSession);
+    };
+    window.addEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
+    return () => window.removeEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
   }, [clearSession]);
 
   const setUser = useCallback((next: User) => setUserState(next), []);

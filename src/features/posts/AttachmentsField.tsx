@@ -3,6 +3,7 @@ import { AlertCircle, CheckCircle2, Link2, RotateCw, X } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { FileDropzone } from '@/components/FileDropzone';
 import { Input } from '@/components/Input';
+import { FEATURES, MAX_ATTACHMENTS } from '@/config';
 import { AttachmentIcon } from '@/components/PostCard';
 import type { Attachment, AttachmentKind } from '@/types';
 import { formatFileSize } from '@/utils/format';
@@ -67,11 +68,13 @@ export function AttachmentsField({ items, onAddFiles, onAddLink, onRemove, onRet
   return (
     <fieldset className="flex flex-col gap-3">
       <legend className="mb-1.5 text-sm font-medium text-ink">
-        Archivos y enlaces
+        {FEATURES.links ? 'Archivos y enlaces' : 'Archivo'}
         <span className="text-danger" aria-hidden>
           {' '}*
         </span>
-        <span className="ml-1 font-normal text-ink-muted">(al menos uno)</span>
+        <span className="ml-1 font-normal text-ink-muted">
+          {MAX_ATTACHMENTS === 1 ? '(un PDF o una imagen)' : '(al menos uno)'}
+        </span>
       </legend>
 
       <FileDropzone
@@ -95,6 +98,8 @@ export function AttachmentsField({ items, onAddFiles, onAddLink, onRemove, onRet
         </ul>
       )}
 
+      {/* Enlaces: ocultos mientras FEATURES.links sea false. */}
+      {FEATURES.links && (
       <div className="flex items-start gap-2">
         <Input
           label="Agregar enlace"
@@ -116,6 +121,7 @@ export function AttachmentsField({ items, onAddFiles, onAddLink, onRemove, onRet
           Agregar
         </Button>
       </div>
+      )}
 
       {error && (
         <p id={errorId} className="text-xs font-medium text-danger">

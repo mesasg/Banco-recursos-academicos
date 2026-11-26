@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { FileStack, Settings, Star } from 'lucide-react';
 import { TabPanel, Tabs } from '@/components/Tabs';
+import { FEATURES } from '@/config';
 import { useCurrentUser } from '@/context/AuthContext';
 import { useFavorites } from '@/context/FavoritesContext';
 import { FavoritesTab } from '@/features/account/FavoritesTab';
@@ -9,7 +10,9 @@ import { ProfileHeader } from '@/features/account/ProfileHeader';
 import { SettingsTab } from '@/features/account/SettingsTab';
 
 type AccountTab = 'publicaciones' | 'favoritos' | 'configuracion';
-const TABS: AccountTab[] = ['publicaciones', 'favoritos', 'configuracion'];
+const TABS: AccountTab[] = FEATURES.favorites
+  ? ['publicaciones', 'favoritos', 'configuracion']
+  : ['publicaciones', 'configuracion'];
 const TABS_ID = 'account';
 
 export function AccountPage() {
@@ -34,7 +37,9 @@ export function AccountPage() {
           className="sm:[&>button]:flex-none"
           items={[
             { id: 'publicaciones', label: 'Mis publicaciones', icon: <FileStack className="h-4 w-4" aria-hidden /> },
-            { id: 'favoritos', label: 'Favoritos', icon: <Star className="h-4 w-4" aria-hidden />, badge: favorites.length },
+            ...(FEATURES.favorites
+              ? [{ id: 'favoritos' as const, label: 'Favoritos', icon: <Star className="h-4 w-4" aria-hidden />, badge: favorites.length }]
+              : []),
             { id: 'configuracion', label: 'Configuración', icon: <Settings className="h-4 w-4" aria-hidden /> },
           ]}
         />
