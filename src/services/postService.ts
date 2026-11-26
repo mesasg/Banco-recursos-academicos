@@ -4,11 +4,13 @@ import { normalize } from '@/utils/text';
 import { api, ApiError } from './apiClient';
 import { ensureCareers } from './catalogService';
 import { subjectIdsOfCareer, toPost, type RecursoDto } from './mappers';
+import { getFavorites } from './userService';
 
 /**
  * Recursos académicos contra el backend:
  *   GET    /api/recursos[?idAsignatura=]            (con valoración del usuario actual)
- *   POST   /api/recursos                            (multipart: archivo, idAsignatura, titulo)
+ *   POST   /api/recursos         (multipart: archivo o enlace, idAsignatura, titulo, descripcion)
+ *   PUT    /api/recursos/:id     (mismos campos; archivo o enlace solo si cambia)
  *   DELETE /api/recursos/:id
  *   PUT    /api/recursos/:id/valoraciones           { estrellas: 1..5 }
  * Búsqueda, filtro por autor y paginación se resuelven en el cliente.
@@ -32,9 +34,11 @@ export async function getPosts(query: PostQuery = {}): Promise<Page<Post>> {
   const terms = normalize(query.q ?? '').split(/\s+/).filter(Boolean);
 
   const careerSubjects = query.careerId ? subjectIdsOfCareer(query.careerId) : null;
+  const favorites = query.onlyFavorites ? new Set((await getFavorites()).map((f) => f.id)) : null;
   const filtered = (await fetchAll(query.subjectId))
     // Una carrera agrupa los recursos de todas sus materias.
     .filter((p) => !careerSubjects || careerSubjects.has(p.subject.id))
+    .filter((p) => !favorites || favorites.has(p.author.id))
     .filter((p) => !query.authorId || p.author.id === query.authorId)
     .filter((p) => matchesQuery(p, terms));
 
@@ -59,24 +63,44 @@ export async function getPost(id: string): Promise<Post> {
 /** Archivos elegidos en el formulario, a la espera de publicarse con el recurso. */
 const pendingFiles = new Map<string, File>();
 
-export async function createPost(input: PostInput): Promise<Post> {
+/**
+ * Arma el formulario multipart. Un recurso lleva un archivo o un enlace; en la
+ * edición solo se envía si cambió (si no, el backend conserva el actual).
+ */
+function buildForm(input: PostInput, current?: Post): FormData {
   if (!input.title.trim()) throw new ApiError('El título es obligatorio.', 400);
   if (!input.subjectId) throw new ApiError('Elige la materia.', 400);
-  const attachment = input.attachments.find((a) => a.kind !== 'link' && pendingFiles.has(a.id));
-  const file = attachment ? pendingFiles.get(attachment.id) : undefined;
-  if (!file) throw new ApiError('Adjunta un archivo PDF o una imagen.', 400);
-
   const form = new FormData();
-  form.append('archivo', file, file.name);
   form.append('idAsignatura', input.subjectId);
   form.append('titulo', input.title.trim());
-  const created = await api.post<RecursoDto>('/api/recursos', form);
+  if (input.description?.trim()) form.append('descripcion', input.description.trim());
+
+  const fileAttachment = input.attachments.find((a) => a.kind !== 'link' && pendingFiles.has(a.id));
+  const link = input.attachments.find((a) => a.kind === 'link' && a.url);
+  const unchanged = current && input.attachments.some((a) => current.attachments.some((c) => c.id === a.id));
+
+  if (fileAttachment) {
+    const file = pendingFiles.get(fileAttachment.id)!;
+    form.append('archivo', file, file.name);
+  } else if (link && !unchanged) {
+    form.append('enlace', link.url!);
+  } else if (!current) {
+    throw new ApiError('Adjunta un archivo o un enlace.', 400);
+  }
+  return form;
+}
+
+export async function createPost(input: PostInput): Promise<Post> {
+  const created = await api.post<RecursoDto>('/api/recursos', buildForm(input));
   for (const a of input.attachments) pendingFiles.delete(a.id);
   return toPost(created);
 }
 
-export async function updatePost(_id: string, _input: PostInput): Promise<Post> {
-  throw new ApiError('Editar recursos no está disponible en esta versión.', 501);
+export async function updatePost(id: string, input: PostInput): Promise<Post> {
+  const current = await getPost(id);
+  const updated = await api.put<RecursoDto>(`/api/recursos/${id}`, buildForm(input, current));
+  for (const a of input.attachments) pendingFiles.delete(a.id);
+  return toPost(updated);
 }
 
 export async function deletePost(id: string): Promise<void> {

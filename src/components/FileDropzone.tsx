@@ -24,7 +24,7 @@ export function FileDropzone({ onFiles, onReject, disabled, error, describedById
     const accepted: File[] = [];
     const rejected: string[] = [];
     for (const file of Array.from(list)) {
-      if (!ACCEPTED_FILE_TYPES[file.type]) rejected.push(`"${file.name}" no es PDF, PNG ni JPG.`);
+      if (!ACCEPTED_FILE_TYPES[file.type]) rejected.push(`"${file.name}" no es un PDF ni una imagen.`);
       else if (file.size > MAX_FILE_SIZE_BYTES) rejected.push(`"${file.name}" supera el límite de ${MAX_FILE_SIZE_MB} MB.`);
       else accepted.push(file);
     }
@@ -71,7 +71,7 @@ export function FileDropzone({ onFiles, onReject, disabled, error, describedById
         Seleccionar archivos
       </Button>
       <p id={hintId} className="mt-2 text-xs text-ink-muted">
-        PDF, PNG o JPG · máximo {MAX_FILE_SIZE_MB} MB por archivo
+        PDF o imagen (PNG, JPG, WEBP, GIF) · máximo {MAX_FILE_SIZE_MB} MB
       </p>
       <input
         ref={inputRef}

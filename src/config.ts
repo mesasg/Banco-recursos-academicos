@@ -30,13 +30,17 @@ export const CAREER_SHORT_NAME = 'Ing. de Sistemas';
 export const FEATURES = {
   /** Recuadro "Cuenta de prueba" del login (solo útil con datos mock). */
   demoAccount: false,
-  favorites: false,
-  editPost: false,
-  postDescription: false,
-  links: false,
-  profileEdit: false,
-  changePassword: false,
-  deleteAccount: false,
+  favorites: true,
+  editPost: true,
+  postDescription: true,
+  /** Un recurso lleva un archivo o un enlace (MAX_ATTACHMENTS = 1). */
+  links: true,
+  /** Editar nombre y carrera. La foto de perfil se controla con `avatar`. */
+  profileEdit: true,
+  avatar: false,
+  changePassword: true,
+  deleteAccount: true,
+  /** Requiere un servicio de envío de correos. */
   passwordReset: false,
 } as const;
 

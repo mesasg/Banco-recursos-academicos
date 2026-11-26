@@ -149,7 +149,7 @@ export function PostFormPage() {
       description: values.description.length > POST_DESCRIPTION_MAX ? `Máximo ${POST_DESCRIPTION_MAX} caracteres.` : undefined,
       careerId: values.careerId ? undefined : 'Elige la carrera.',
       subjectId: values.subjectId ? undefined : 'Elige la materia.',
-      attachments: doneAttachments.length ? undefined : 'Agrega al menos un archivo o enlace.',
+      attachments: doneAttachments.length ? undefined : FEATURES.links ? 'Agrega al menos un archivo o enlace.' : 'Agrega un archivo.',
     };
   }, [values, doneAttachments.length]);
 
@@ -157,7 +157,7 @@ export function PostFormPage() {
   const missing = [
     errors.title && 'título',
     (errors.careerId || errors.subjectId) && 'carrera y materia',
-    errors.attachments && !uploading && 'un archivo o enlace',
+    errors.attachments && !uploading && (FEATURES.links ? 'un archivo o enlace' : 'un archivo'),
   ].filter(Boolean);
 
   const dirty =
@@ -225,7 +225,8 @@ export function PostFormPage() {
 
   const addLink = (url: string) => {
     const attachment: Attachment = { id: `link-${Date.now()}`, kind: 'link', name: linkName(url), url };
-    setItems((list) => [...list, { ...fromAttachment(attachment), isNew: true }]);
+    // Con MAX_ATTACHMENTS = 1 el enlace reemplaza al adjunto anterior.
+    setItems((list) => [...list, { ...fromAttachment(attachment), isNew: true }].slice(-MAX_ATTACHMENTS));
     setTouched((t) => ({ ...t, attachments: true }));
   };
 

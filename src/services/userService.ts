@@ -1,10 +1,14 @@
 import type { ProfileUpdate, User, UserStats, UserSummary } from '@/types';
-import { api, ApiError } from './apiClient';
-import type { RecursoDto } from './mappers';
+import { api } from './apiClient';
+import { toUser, toUserSummary, type AutorDto, type RecursoDto, type UsuarioDto } from './mappers';
 
 /**
- * Estadísticas del perfil a partir de GET /api/recursos.
- * Favoritos y edición de perfil no existen en el backend (FEATURES en config).
+ * Perfil, estadísticas y usuarios favoritos:
+ *   GET    /api/recursos                         (estadísticas del perfil)
+ *   PUT    /api/usuarios/me                      { nombre, idCarrera }
+ *   GET    /api/usuarios/me/favoritos
+ *   PUT    /api/usuarios/me/favoritos/:idUsuario
+ *   DELETE /api/usuarios/me/favoritos/:idUsuario
  */
 
 export async function getUserStats(userId: string): Promise<UserStats> {
@@ -19,19 +23,23 @@ export async function getUserStats(userId: string): Promise<UserStats> {
 }
 
 export async function getFavorites(): Promise<UserSummary[]> {
-  return [];
+  const favoritos = await api.get<AutorDto[]>('/api/usuarios/me/favoritos');
+  return favoritos.map(toUserSummary);
 }
 
-const notAvailable = () => new ApiError('Esta función no está disponible en esta versión.', 501);
-
-export async function addFavorite(_userId: string): Promise<void> {
-  throw notAvailable();
+export async function addFavorite(userId: string): Promise<void> {
+  await api.put<void>(`/api/usuarios/me/favoritos/${userId}`);
 }
 
-export async function removeFavorite(_userId: string): Promise<void> {
-  throw notAvailable();
+export async function removeFavorite(userId: string): Promise<void> {
+  await api.delete<void>(`/api/usuarios/me/favoritos/${userId}`);
 }
 
-export async function updateProfile(_update: ProfileUpdate): Promise<User> {
-  throw notAvailable();
+/** Actualiza nombre y carrera. La foto de perfil no se envía (FEATURES.avatar). */
+export async function updateProfile(update: ProfileUpdate): Promise<User> {
+  const usuario = await api.put<UsuarioDto>('/api/usuarios/me', {
+    nombre: update.name.trim(),
+    idCarrera: update.careerId || null,
+  });
+  return toUser(usuario);
 }

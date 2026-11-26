@@ -121,10 +121,21 @@ export async function requestPasswordReset(_email: string): Promise<void> {
   throw notAvailable();
 }
 
-export async function changePassword(_currentPassword: string, _newPassword: string): Promise<void> {
-  throw notAvailable();
+/** PUT /api/usuarios/me/contrasena { actual, nueva } */
+export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  try {
+    await api.put<void>('/api/usuarios/me/contrasena', { actual: currentPassword, nueva: newPassword });
+  } catch (error) {
+    if (error instanceof ApiError && /actual/i.test(error.message)) {
+      throw new ApiError('La contraseña actual no es correcta.', 400, 'WRONG_PASSWORD');
+    }
+    throw error;
+  }
 }
 
+/** DELETE /api/usuarios/me: borra la cuenta y todo su contenido, y cierra la sesión. */
 export async function deleteAccount(): Promise<void> {
-  throw notAvailable();
+  await api.delete<void>('/api/usuarios/me');
+  clearStored();
+  setAuthToken(null);
 }

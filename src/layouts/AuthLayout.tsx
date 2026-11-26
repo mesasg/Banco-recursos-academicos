@@ -4,7 +4,7 @@ import { Logo } from '@/components/Logo';
 import { APP_NAME } from '@/config';
 
 const highlights = [
-  { icon: BookOpenCheck, text: 'Apuntes, diagramas, PDFs y enlaces para cada estilo de aprendizaje' },
+  { icon: BookOpenCheck, text: 'Apuntes, diagramas, PDFs y enlaces para distintas formas de aprender' },
   { icon: MessagesSquare, text: 'Foros para resolver dudas entre compañeros' },
   { icon: Star, text: 'Califica los recursos compartidos' },
 ];

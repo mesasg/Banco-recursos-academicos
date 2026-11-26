@@ -29,6 +29,7 @@ export interface CarreraDto {
 export interface RecursoDto {
   id: string;
   titulo: string;
+  descripcion?: string | null;
   urlStorage: string;
   tipoFormato: string;
   idAsignatura: string;
@@ -129,16 +130,33 @@ export function fileNameFromUrl(url: string): string {
   return decoded.replace(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}_/i, '');
 }
 
+/** Nombre visible de un enlace: dominio y ruta, sin el protocolo. */
+function linkName(url: string): string {
+  try {
+    const u = new URL(url);
+    return `${u.hostname.replace(/^www\./, '')}${u.pathname === '/' ? '' : u.pathname}`;
+  } catch {
+    return url;
+  }
+}
+
+/** Id del adjunto que ya está guardado en un recurso. */
+export function savedAttachmentId(recursoId: string): string {
+  return `${recursoId}-adjunto`;
+}
+
 export function toPost(r: RecursoDto): Post {
+  const isLink = r.tipoFormato === 'URL';
   const attachment: Attachment = {
-    id: `${r.id}-archivo`,
-    kind: r.tipoFormato === 'PDF' ? 'pdf' : 'image',
-    name: fileNameFromUrl(r.urlStorage),
+    id: savedAttachmentId(r.id),
+    kind: isLink ? 'link' : r.tipoFormato === 'PDF' ? 'pdf' : 'image',
+    name: isLink ? linkName(r.urlStorage) : fileNameFromUrl(r.urlStorage),
     url: r.urlStorage,
   };
   return {
     id: r.id,
     title: r.titulo,
+    description: r.descripcion ?? undefined,
     author: toUserSummary({ id: r.idAutor, nombre: r.autor, idCarrera: r.idCarreraAutor }),
     career: careerFor(r.idCarreraAutor, r.idAsignatura),
     subject: { id: r.idAsignatura, name: r.asignatura },

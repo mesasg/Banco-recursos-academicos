@@ -92,6 +92,8 @@ function ProfileForm() {
       <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
         <div className="flex flex-wrap items-center gap-4">
           <Avatar name={name || user.name} src={preview} size="lg" />
+          {/* Foto de perfil: oculta mientras FEATURES.avatar sea false. */}
+          {FEATURES.avatar && (
           <div className="flex flex-col gap-1">
             <div className="flex flex-wrap gap-2">
               <Button variant="secondary" size="sm" leftIcon={<Camera className="h-4 w-4" aria-hidden />} onClick={() => fileRef.current?.click()}>
@@ -114,6 +116,7 @@ function ProfileForm() {
               {errors.avatar ?? `PNG o JPG, máximo ${MAX_AVATAR_SIZE_MB} MB.`}
             </p>
           </div>
+          )}
           <input
             ref={fileRef}
             type="file"

@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { LayoutGrid, Search, X } from 'lucide-react';
+import { ChevronRight, LayoutGrid, Search, X } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { Skeleton } from '@/components/Skeleton';
+import { useAuth } from '@/context/AuthContext';
 import { useCatalog } from '@/context/CatalogContext';
 import type { Career } from '@/types';
 import { cn, normalize } from '@/utils/text';
@@ -41,6 +42,24 @@ export function SubjectSidebar({ onNavigate }: SubjectSidebarProps) {
   const activeSubject = onFeed ? filters.subjectId : null;
   const activeCareer = onFeed ? filters.careerId : null;
 
+  // Carreras desplegadas. Por defecto: la del usuario y la del filtro activo.
+  const { user } = useAuth();
+  const [toggled, setToggled] = useState<Record<string, boolean>>({});
+  const defaultOpen = useMemo(() => {
+    const ids = new Set<string>();
+    if (user?.careerId) ids.add(user.careerId);
+    if (activeCareer) ids.add(activeCareer);
+    if (activeSubject) {
+      const owner =
+        careers.find((c) => c.id === user?.careerId && c.subjects.some((s) => s.id === activeSubject)) ??
+        careers.find((c) => c.subjects.some((s) => s.id === activeSubject));
+      if (owner) ids.add(owner.id);
+    }
+    return ids;
+  }, [careers, user?.careerId, activeCareer, activeSubject]);
+  const isOpen = (id: string) => toggled[id] ?? defaultOpen.has(id);
+  const toggle = (id: string) => setToggled((t) => ({ ...t, [id]: !isOpen(id) }));
+
   const term = normalize(search);
   const visible = useMemo<Career[]>(() => {
     if (!term) return careers;
@@ -51,7 +70,11 @@ export function SubjectSidebar({ onNavigate }: SubjectSidebarProps) {
       .filter((c) => c.subjects.length > 0);
   }, [careers, term]);
 
-  const total = careers.reduce((sum, c) => sum + c.subjects.reduce((s, x) => s + x.postCount, 0), 0);
+  // Las materias del tronco común están en varias carreras: cada una se cuenta una sola vez.
+  const total = [...new Map(careers.flatMap((c) => c.subjects.map((s) => [s.id, s.postCount] as const))).values()].reduce(
+    (sum, n) => sum + n,
+    0,
+  );
 
   return (
     <nav aria-label="Carreras y materias" className="flex flex-col gap-3 p-3">
@@ -120,14 +143,32 @@ export function SubjectSidebar({ onNavigate }: SubjectSidebarProps) {
       <ul className="flex flex-col gap-1">
         {visible.map((career) => {
           const headingId = `career-${career.id}`;
+          const listId = `career-list-${career.id}`;
           const count = career.subjects.reduce((s, x) => s + x.postCount, 0);
           const careerActive = activeCareer === career.id;
+          // Al buscar se muestran abiertas todas las carreras con coincidencias.
+          const open = Boolean(term) || isOpen(career.id);
           return (
             <li key={career.id}>
-              <h3 id={headingId} className="flex min-h-9 items-center px-3 pt-1 text-sm font-semibold text-ink">
-                {career.name}
+              <h3 id={headingId} className="text-sm font-semibold text-ink">
+                <button
+                  type="button"
+                  onClick={() => toggle(career.id)}
+                  aria-expanded={open}
+                  aria-controls={listId}
+                  disabled={Boolean(term)}
+                  className="flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left transition-colors hover:bg-primary-100/60 disabled:hover:bg-transparent md:min-h-9"
+                >
+                  <ChevronRight
+                    className={cn('h-4 w-4 shrink-0 text-ink-muted transition-transform', open && 'rotate-90')}
+                    aria-hidden
+                  />
+                  <span className="flex-1">{career.name}</span>
+                  {!open && count > 0 && <CountBadge value={count} />}
+                </button>
               </h3>
-              <ul aria-labelledby={headingId} className="ml-3 mt-0.5 flex flex-col gap-0.5 border-l border-line pl-2">
+              {open && (
+              <ul id={listId} aria-labelledby={headingId} className="ml-5 mt-0.5 flex flex-col gap-0.5 border-l border-line pl-2">
                 {!term && (
                   <li>
                     <Link
@@ -158,6 +199,7 @@ export function SubjectSidebar({ onNavigate }: SubjectSidebarProps) {
                   );
                 })}
               </ul>
+              )}
             </li>
           );
         })}
